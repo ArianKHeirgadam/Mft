@@ -56,3 +56,17 @@ dotnet run --project src/Mft.Api
 ```
 
 The repository contains the UTF-8 backend/API bridge files. The original uploaded binary frontend archive is not claimed as fully mirrored because the GitHub file connector used for this implementation does not accept binary ZIP uploads.
+
+
+## Additional API controllers
+- `/api/manage/students/{id}` — update student profile (authorized staff only).
+- `/api/manage/teachers/{id}` — update teacher profile (SuperAdmin/Department).
+- `/api/manage/users/{id}/active` — activate/deactivate accounts (SuperAdmin).
+- `/api/manage/questions/{id}` — update/delete questions with ownership checks.
+- `/api/manage/exams/{id}` — update/delete exams and list attempts.
+- `/api/manage/answers/{id}/grade` — grade submitted answers.
+- `/api/portal/me` — current account profile.
+- `/api/portal/my-exams`, `/api/portal/exams/{id}/start`, `/api/portal/attempts/{id}/submit`, `/api/portal/my-attempts` — student exam workflow.
+- `/api/portal/notifications` and `/api/portal/notifications/{id}/read` — personal notifications.
+
+A GitHub Actions workflow at `.github/workflows/dotnet.yml` restores and builds the solution with the .NET 8 SDK on pushes and pull requests.
