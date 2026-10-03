@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from "react";
+import {useEffect,useMemo,useState,type FormEvent} from "react";
 import {login,changePassword} from "../api/auth.api";
 import {get} from "../api/client";
 import {myExams,myAttempts,notifications,markNotificationRead} from "../api/portal.api";
@@ -7,7 +7,7 @@ import type {Role,Student,Teacher,Department,Exam,Notification,LoginResponse} fr
 
 function Login({onLogin}:{onLogin:(x:LoginResponse)=>void}){
  const [username,setUsername]=useState(""),[password,setPassword]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
- async function submit(e:React.FormEvent){e.preventDefault();setError("");setBusy(true);try{onLogin(await login(username,password))}catch(e){setError(e instanceof Error?e.message:"Login failed")}finally{setBusy(false)}}
+ async function submit(e:FormEvent){e.preventDefault();setError("");setBusy(true);try{onLogin(await login(username,password))}catch(e){setError(e instanceof Error?e.message:"Login failed")}finally{setBusy(false)}}
  return <main className="auth"><form className="card auth-card" onSubmit={submit}><h1>MFT</h1><p>سامانه مدیریت آموزشی</p><label>نام کاربری<input value={username} onChange={e=>setUsername(e.target.value)} required autoComplete="username"/></label><label>رمز عبور<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required autoComplete="current-password"/></label>{error&&<div className="error">{error}</div>}<button disabled={busy}>{busy?"در حال ورود...":"ورود"}</button></form></main>;
 }
 function ChangePassword({onDone}:{onDone:()=>void}){const [c,setC]=useState(""),[n,setN]=useState(""),[e,setE]=useState("");async function go(x:React.FormEvent){x.preventDefault();setE("");try{await changePassword(c,n);onDone()}catch(e){setE(e instanceof Error?e.message:"خطا")}}return <main className="auth"><form className="card auth-card" onSubmit={go}><h2>تغییر رمز عبور</h2><label>رمز فعلی<input type="password" value={c} onChange={e=>setC(e.target.value)} required/></label><label>رمز جدید<input type="password" minLength={8} value={n} onChange={e=>setN(e.target.value)} required/></label>{e&&<div className="error">{e}</div>}<button>ذخیره</button></form></main>}
