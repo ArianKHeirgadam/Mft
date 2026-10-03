@@ -1,6 +1,6 @@
 using Mft.Domain;
 namespace Mft.Application.Contracts;
-public record LoginRequest(string Username,string Password,UserRole Role);
+public record LoginRequest(string Username,string Password);
 public record LoginResponse(string Token,Guid UserId,string FullName,UserRole Role,bool MustChangePassword);
 public record ChangePasswordRequest(string CurrentPassword,string NewPassword);
 public record StudentDto(Guid Id,string FullName,string StudentNumber,string Department,string DegreeLevel,decimal? GPA,string Status);
