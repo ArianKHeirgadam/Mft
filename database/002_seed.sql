@@ -1,0 +1,5 @@
+USE MftDb;
+DECLARE @dep uniqueidentifier=NEWID(),@teacher uniqueidentifier=NEWID(),@tu uniqueidentifier=NEWID(),@admin uniqueidentifier=NEWID();
+IF NOT EXISTS(SELECT 1 FROM Departments WHERE Name=N'مهندسی کامپیوتر') INSERT Departments(Id,Name,ManagerName,DegreeLevel) VALUES(@dep,N'مهندسی کامپیوتر',N'مهندس احمدی',N'کارشناسی'); ELSE SELECT @dep=Id FROM Departments WHERE Name=N'مهندسی کامپیوتر';
+IF NOT EXISTS(SELECT 1 FROM Users WHERE Username='admin') INSERT Users(Id,Username,PasswordHash,Role,FullName,Email) VALUES(@admin,'admin',N'$2a$11$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llCj9x1g5cY9G8gJ7m7u2','SuperAdmin',N'مدیر سیستم',N'admin@mft.local');
+IF NOT EXISTS(SELECT 1 FROM Users WHERE Username='teacher') BEGIN INSERT Users(Id,Username,PasswordHash,Role,FullName,Email) VALUES(@tu,'teacher',N'$2a$11$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llCj9x1g5cY9G8gJ7m7u2','Teacher',N'دکتر کریمی',N'teacher@mft.local'); INSERT Teachers(Id,UserId,DepartmentId,Specialty,Status) VALUES(@teacher,@tu,@dep,N'هوش مصنوعی و یادگیری ماشین',N'Active'); END
