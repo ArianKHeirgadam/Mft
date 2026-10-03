@@ -1,5 +1,5 @@
 /* Legacy MFT API bridge. Authentication is username/password only; role is returned by the server. */
-const API_BASE = window.MFT_API_BASE || 'http://localhost:5148/api';
+const API_BASE = window.MFT_API_BASE || 'http://localhost:51757/api';
 const api = {
  async request(path, options={}) {
   const token=localStorage.getItem('mft_token');
@@ -15,7 +15,7 @@ const api = {
 };
 window.MftApi=api;
 function authRequired(){ if(!localStorage.getItem('mft_token') && !location.pathname.endsWith('login.html') && !location.pathname.endsWith('index.html')) location.href='login.html'; }
-async function initLogin(){
+async function initLogin(){ 
  const f=document.getElementById('loginForm');if(!f)return;
  f.addEventListener('submit',async e=>{
   e.preventDefault();const btn=document.getElementById('loginBtn');btn.disabled=true;
