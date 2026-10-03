@@ -27,7 +27,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
  ValidateLifetime=true,ValidateIssuerSigningKey=true,IssuerSigningKey=new SymmetricSecurityKey(key)
 });
 builder.Services.AddAuthorization();
-var corsOrigins=builder.Configuration.GetSection("Cors:Origins").Get<string[]>()??Array.Empty<string>();
+var corsOrigins=builder.Configuration.GetSection("Cors:Origins").GetChildren().Select(x=>x.Value).Where(x=>!string.IsNullOrWhiteSpace(x)).Cast<string>().ToArray();
 builder.Services.AddCors(o=>o.AddDefaultPolicy(p=>p.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod()));
 var app=builder.Build();
 app.UseExceptionHandler(handler=>handler.Run(async context=>{var ex=context.Features.Get<IExceptionHandlerFeature>()?.Error;context.Response.ContentType="application/json";context.Response.StatusCode=ex switch{UnauthorizedAccessException=>StatusCodes.Status403Forbidden,ArgumentException=>StatusCodes.Status400BadRequest,KeyNotFoundException=>StatusCodes.Status404NotFound,_=>StatusCodes.Status500InternalServerError};await context.Response.WriteAsJsonAsync(new{message=app.Environment.IsDevelopment()?ex?.Message:"خطای داخلی سرور."});}));
