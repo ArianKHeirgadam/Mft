@@ -16,3 +16,9 @@ jobs:
         run: dotnet restore Mft.sln
       - name: Build
         run: dotnet build Mft.sln --configuration Release --no-restore
+      - name: Frontend install
+        working-directory: frontend
+        run: npm install
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build
