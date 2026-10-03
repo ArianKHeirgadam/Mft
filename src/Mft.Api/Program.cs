@@ -10,7 +10,7 @@ using Mft.Infrastructure.Persistence;
 using Mft.Api;
 var builder=WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(); builder.Services.AddEndpointsApiExplorer(); builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<AppDbContext>(o=>o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddDbContext<AppDbContext>(o=>o.UseSqlServer(builder.Configuration.GetConnectionString("Default"), sql=>sql.EnableRetryOnFailure(maxRetryCount:5, maxRetryDelay:TimeSpan.FromSeconds(10), errorNumbersToAdd:null)));
 builder.Services.AddScoped<IMftDbContext>(sp=>sp.GetRequiredService<AppDbContext>());
 builder.Services.AddScoped<IMftService,MftService>(); builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddHttpContextAccessor(); builder.Services.AddScoped<ICurrentUser,CurrentUser>();
