@@ -15,11 +15,20 @@ builder.Services.AddScoped<IMftDbContext>(sp=>sp.GetRequiredService<AppDbContext
 builder.Services.AddScoped<IMftService,MftService>(); builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddHttpContextAccessor(); builder.Services.AddScoped<ICurrentUser,CurrentUser>();
 builder.Services.AddHttpClient("sms"); builder.Services.AddScoped<ISmsSender,KavenegarSmsSender>();
-var keyText=builder.Configuration["Jwt:Key"]??throw new InvalidOperationException("Jwt:Key is required.");
+var keyText=builder.Configuration["Jwt:Key"];
+if(string.IsNullOrWhiteSpace(keyText)||keyText.Length<32||keyText.StartsWith("CHANGE_THIS",StringComparison.Ordinal))
+ throw new InvalidOperationException("Jwt:Key is required and must be a random secret of at least 32 characters.");
 var key=Encoding.UTF8.GetBytes(keyText);
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o=>o.TokenValidationParameters=new TokenValidationParameters{ValidateIssuer=false,ValidateAudience=false,ValidateLifetime=true,ValidateIssuerSigningKey=true,IssuerSigningKey=new SymmetricSecurityKey(key)});
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o=>o.TokenValidationParameters=new TokenValidationParameters{
+ ValidateIssuer=!string.IsNullOrWhiteSpace(builder.Configuration["Jwt:Issuer"]),
+ ValidIssuer=builder.Configuration["Jwt:Issuer"],
+ ValidateAudience=!string.IsNullOrWhiteSpace(builder.Configuration["Jwt:Audience"]),
+ ValidAudience=builder.Configuration["Jwt:Audience"],
+ ValidateLifetime=true,ValidateIssuerSigningKey=true,IssuerSigningKey=new SymmetricSecurityKey(key)
+});
 builder.Services.AddAuthorization();
-builder.Services.AddCors(o=>o.AddDefaultPolicy(p=>p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
+var corsOrigins=builder.Configuration.GetSection("Cors:Origins").Get<string[]>()??Array.Empty<string>();
+builder.Services.AddCors(o=>o.AddDefaultPolicy(p=>p.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod()));
 var app=builder.Build();
 app.UseExceptionHandler(handler=>handler.Run(async context=>{var ex=context.Features.Get<IExceptionHandlerFeature>()?.Error;context.Response.ContentType="application/json";context.Response.StatusCode=ex switch{UnauthorizedAccessException=>StatusCodes.Status403Forbidden,ArgumentException=>StatusCodes.Status400BadRequest,KeyNotFoundException=>StatusCodes.Status404NotFound,_=>StatusCodes.Status500InternalServerError};await context.Response.WriteAsJsonAsync(new{message=app.Environment.IsDevelopment()?ex?.Message:"خطای داخلی سرور."});}));
 if(app.Environment.IsDevelopment()){app.UseSwagger();app.UseSwaggerUI();}
