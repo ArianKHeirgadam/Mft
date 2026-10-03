@@ -70,3 +70,25 @@ The repository contains the UTF-8 backend/API bridge files. The original uploade
 - `/api/portal/notifications` and `/api/portal/notifications/{id}/read` — personal notifications.
 
 A GitHub Actions workflow at `.github/workflows/dotnet.yml` restores and builds the solution with the .NET 8 SDK on pushes and pull requests.
+
+## React frontend
+The repository now contains a React + TypeScript + Vite frontend under `frontend/`.
+
+### Local configuration
+Set `Jwt:Key` through environment configuration or user secrets to a random value of at least 32 characters. Do not commit a real JWT secret, SMS API key, or machine-specific production connection string.
+
+For the frontend, copy `frontend/.env.example` to a local `.env` and set `VITE_API_BASE_URL` if the API is not on the default development URL.
+
+Run the backend and frontend independently:
+
+```bash
+dotnet restore
+dotnet build
+dotnet run --project src/Mft.Api
+
+cd frontend
+npm install
+npm run dev
+```
+
+The login contract is username/password only. The authenticated backend resolves the user's role and returns it in the signed JWT/response; the frontend does not submit a role selector.
