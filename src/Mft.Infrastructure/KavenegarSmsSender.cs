@@ -1,3 +1,5 @@
+using System.Net.Http;
+using Microsoft.Extensions.Configuration;
 using Mft.Application.Abstractions;
 namespace Mft.Infrastructure;
 public sealed class KavenegarSmsSender(IConfiguration config,IHttpClientFactory clients):ISmsSender {
